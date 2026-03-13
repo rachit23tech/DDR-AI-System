@@ -16,7 +16,7 @@ if st.button("Generate DDR"):
             "inspection_report": (inspection.name, inspection, "application/pdf"),
             "thermal_report": (thermal.name, thermal, "application/pdf"),
         }
-        resp = requests.post("http://127.0.0.1:8000/generate-ddr", files=files)
+        resp = requests.post("https://ddr-ai-system.onrender.com/generate-ddr", files=files)
         if resp.status_code == 200:
             data = resp.json()
             st.subheader("Extracted Text")
