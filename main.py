@@ -69,7 +69,7 @@ async def generate_ddr(
             unique_images.append(img)
 
     # Limit to maximum 6 images (performance)
-    unique_images = unique_images[:6]
+    unique_images = unique_images[:40]
 
     extracted = {
         "inspection_text": ins_data.get("text", "")[:3000],
