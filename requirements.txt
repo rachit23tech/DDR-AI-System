@@ -2,8 +2,8 @@ fastapi
 uvicorn
 python-dotenv
 requests
-openai
 groq
-streamlit
 pillow
 pymupdf
+streamlit
+python-multipart
