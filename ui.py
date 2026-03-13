@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 
+API_URL = "https://ddr-ai-system.onrender.com/generate-ddr"
+
 st.title("DDR Generator")
 
 inspection = st.file_uploader("Inspection report", type="pdf")
@@ -17,28 +19,45 @@ if st.button("Generate DDR"):
         "thermal_report": (thermal.name, thermal, "application/pdf"),
     }
 
-    with st.spinner("Generating DDR report..."):
-        resp = requests.post(
-            "https://ddr-ai-system.onrender.com/generate-ddr",
-            files=files,
-            timeout=120
-        )
+    try:
+        with st.spinner("Generating DDR report... This may take 1–2 minutes"):
+            resp = requests.post(
+                API_URL,
+                files=files,
+                timeout=300   # increased timeout
+            )
+    except requests.exceptions.Timeout:
+        st.error("The server took too long to respond. Please try again.")
+        st.stop()
+    except requests.exceptions.RequestException as e:
+        st.error(f"Connection error: {e}")
+        st.stop()
 
     if resp.status_code != 200:
-        st.error(resp.text)
+        st.error(f"Server error: {resp.text}")
         st.stop()
 
     data = resp.json()
 
+    extracted = data.get("extracted", {})
+    report = data.get("report", {})
+
     st.subheader("Extracted Text")
 
-    st.write(data["extracted"]["inspection_text"])
-    st.write(data["extracted"]["thermal_text"])
+    st.write(extracted.get("inspection_text", "No inspection text found"))
+    st.write(extracted.get("thermal_text", "No thermal text found"))
 
     st.subheader("Images")
 
-    for img in data["extracted"]["images"]:
-        st.image(img, use_container_width=True)
+    images = extracted.get("images", [])
+
+    if images:
+        cols = st.columns(3)  # display images in grid
+        for i, img in enumerate(images):
+            cols[i % 3].image(img, use_container_width=True)
+    else:
+        st.info("No images extracted.")
 
     st.subheader("DDR Report")
-    st.json(data["report"])
+
+    st.json(report)
