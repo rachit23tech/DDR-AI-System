@@ -1,7 +1,9 @@
 fastapi
-uvicorn[standard]
-PyMuPDF
-openai
+uvicorn
 python-dotenv
-streamlit
+requests
+openai
 groq
+streamlit
+pillow
+pymupdf
