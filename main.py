@@ -55,10 +55,23 @@ async def generate_ddr(
     ins_data = extract_text_and_images(inspection_path, UPLOAD_DIR)
     ther_data = extract_text_and_images(thermal_path, UPLOAD_DIR)
 
+    # Combine images
+    images = ins_data.get("images", []) + ther_data.get("images", [])
+
+    # Remove duplicate images while keeping order
+    seen = set()
+    unique_images = []
+
+    for img in images:
+        name = os.path.basename(img)
+        if name not in seen:
+            seen.add(name)
+            unique_images.append(img)
+
     extracted = {
         "inspection_text": ins_data.get("text", ""),
         "thermal_text": ther_data.get("text", ""),
-        "images": ins_data.get("images", []) + ther_data.get("images", []),
+        "images": unique_images,
     }
 
     # Convert filesystem paths → public URLs
