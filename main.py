@@ -1,5 +1,7 @@
 import os
 import shutil
+from urllib.parse import quote
+
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -20,7 +22,7 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 # Allow Streamlit frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow Streamlit Cloud too
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,9 +61,9 @@ async def generate_ddr(
         "images": ins_data.get("images", []) + ther_data.get("images", []),
     }
 
-    # Convert image paths to URLs so Streamlit can access them
+    # Convert filesystem paths → public URLs
     extracted["images"] = [
-        f"{BASE_URL}/uploads/{os.path.basename(img)}"
+        f"{BASE_URL}/uploads/{quote(os.path.basename(img))}"
         for img in extracted["images"]
     ]
 
@@ -81,9 +83,4 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+    uvicorn.run(app, host="0.0.0.0", port=8000)
