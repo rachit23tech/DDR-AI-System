@@ -13,7 +13,7 @@ def extract_text_and_images(pdf_path: str, upload_dir: str) -> Dict[str, object]
     images: List[str] = []
 
     MAX_WIDTH = 800
-    MAX_IMAGES_PER_PAGE = 2   # performance limit
+    MAX_IMAGES_PER_PAGE = 4   # performance limit
 
     for page_num in range(len(doc)):
         page = doc[page_num]
